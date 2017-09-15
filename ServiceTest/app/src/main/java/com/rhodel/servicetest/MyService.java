@@ -11,7 +11,8 @@ import android.support.annotation.Nullable;
 
 public class MyService extends IntentService {
 
-    private MyBroadcastReceiver.MyBroadCastReceiverListener mListener = null;
+    private boolean mKeepLooping = true;
+
 
     public MyService() {
         super("MyService");
@@ -21,7 +22,7 @@ public class MyService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         long startTime = System.currentTimeMillis();
 
-        while (true) {
+        while (mKeepLooping) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             if (elapsedTime >= 1000) {
                 startTime = System.currentTimeMillis();
@@ -31,5 +32,11 @@ public class MyService extends IntentService {
             }
         }
 
+    }
+
+    @Override
+    public void onDestroy() {
+        mKeepLooping = false;
+        super.onDestroy();
     }
 }
