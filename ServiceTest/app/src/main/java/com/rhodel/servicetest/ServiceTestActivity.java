@@ -82,7 +82,9 @@ public class ServiceTestActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        mMyBroadcastReceiver = new MyBroadcastReceiver();
+        if (mMyBroadcastReceiver == null)
+            mMyBroadcastReceiver = new MyBroadcastReceiver();
+
         mMyBroadcastReceiver.setListener(new MyBroadcastReceiver.MyBroadCastReceiverListener() {
             @Override
             public void onTick() {
@@ -91,10 +93,10 @@ public class ServiceTestActivity extends AppCompatActivity {
             }
         });
 
-        if (mStarted) {
-            IntentFilter intentFilter = new IntentFilter("TICK");
-            registerReceiver(mMyBroadcastReceiver, intentFilter);
+        IntentFilter intentFilter = new IntentFilter("TICK");
+        registerReceiver(mMyBroadcastReceiver, intentFilter);
 
+        if (mStarted) {
             Intent intent = new Intent(this, MyService.class);
             startService(intent);
         }
@@ -105,7 +107,8 @@ public class ServiceTestActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        unregisterReceiver(mMyBroadcastReceiver);
+        if (!mStarted)
+            unregisterReceiver(mMyBroadcastReceiver);
 
     }
 
@@ -119,7 +122,7 @@ public class ServiceTestActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-        if (isFinishing()) {
+        if (isFinishing() && !mStarted) {
             Intent stopMyServiceIntent = new Intent(ServiceTestActivity.this, MyService.class);
             stopService(stopMyServiceIntent);
         }
